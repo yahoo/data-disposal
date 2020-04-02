@@ -1,0 +1,16 @@
+entries:
+  - database: somename
+    table: users
+    partitionFilterKey: date
+    deleteExternalData: true
+    retentionDuration: 14
+    granularity: DAYS
+    dateFormat: yyyy-MM
+
+  - database: somename2
+    table: comments
+    partitionFilterKey: date
+    deleteExternalData: false
+    retentionDuration: 14
+    granularity: WEEKS
+    dateFormat: yyyy-MM

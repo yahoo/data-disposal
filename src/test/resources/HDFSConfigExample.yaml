@@ -1,0 +1,15 @@
+hdfsNamenode: "hdfs://namenode:8020"
+
+entries:
+  - path: hdfs://namenode:8020/somepath/dir/date=%s
+    retentionDuration: 14
+    granularity: DAYS
+    retentionType: PATH_DATE
+    dateFormat: yyyy-MM-dd
+    recursive: true
+
+  - path: hdfs://namenode:8020/somepath/metadata/somepath
+    retentionDuration: 14
+    granularity: HOURS
+    retentionType: MODIFICATION_TIME
+    recursive: false
