@@ -50,6 +50,14 @@ public class HiveDisposalTest {
         };
     }
 
+    @DataProvider(name = "hivePartitionFilterEnabled")
+    public Object[][] hivePartitionFilterEnabled() throws HCatException {
+        return new Object[][] {
+                {false},
+                {true},
+        };
+    }
+
     @DataProvider(name = "schemata")
     public Object[][] schemata() throws HCatException {
 
@@ -129,7 +137,6 @@ public class HiveDisposalTest {
         entry.setRetentionDuration(retentionDuration);
         entry.setGranularity(granularity);
         entry.setDateFormat(format);
-
         HiveConfigList conf = new HiveConfigList();
         List<HiveConfigEntry> theList = new ArrayList<>();
         conf.setEntries(theList);
@@ -173,13 +180,53 @@ public class HiveDisposalTest {
         entry.setRetentionDuration(-1);
         entry.setGranularity(ChronoUnit.MICROS);
         entry.setDateFormat("yyyy-mm-dd");
-
         HiveConfigList conf = new HiveConfigList();
         List<HiveConfigEntry> theList = new ArrayList<>();
         theList.add(entry);
         conf.setEntries(theList);
 
         HiveDisposal disposal = new HiveDisposal(conf, true, client);
+    }
+
+    @Test(dataProvider = "hivePartitionFilterEnabled")
+    public void testHiveValidationFilterNoFailure(boolean hiveFilterEnabled) throws HCatException {
+
+        HCatClient client = Mockito.mock(HCatClient.class);
+        HCatTable   table = Mockito.mock(HCatTable.class);
+        List<HCatFieldSchema> mockColumns = new ArrayList<>();
+        HCatFieldSchema column1  = Mockito.mock(HCatFieldSchema.class);
+        HCatFieldSchema column2  = Mockito.mock(HCatFieldSchema.class);
+
+        when(column1.getName()).thenReturn("run_date");
+        when(column2.getName()).thenReturn("ticker");
+
+        mockColumns.add(column1);
+        mockColumns.add(column2);
+
+        when(client.getTable("whatever", "whatever")).thenReturn(table);
+        when(table.getPartCols()).thenReturn(mockColumns);
+
+        HiveConfigEntry entry = new HiveConfigEntry();
+        entry.setDatabase("test");
+        entry.setTable("notexisting");
+        entry.setPartitionFilterKey("DOES NOT EXIST");
+        entry.setDeleteExternalData(false);
+        entry.setEnableHivePartitionFilter(hiveFilterEnabled);
+        entry.setRetentionDuration(-1);
+        entry.setGranularity(ChronoUnit.MICROS);
+        entry.setDateFormat("yyyy-mm-dd");
+        entry.setValidationEnabled(false);
+        
+        HiveConfigList conf = new HiveConfigList();
+        List<HiveConfigEntry> theList = new ArrayList<>();
+        theList.add(entry);
+        conf.setEntries(theList);
+
+        try {
+             HiveDisposal disposal = new HiveDisposal(conf, true, client);
+         } catch(Exception e) {
+             Assert.fail("Should not have thrown any exception");
+         }                
     }
 
     @Test(dataProvider = "schemata")

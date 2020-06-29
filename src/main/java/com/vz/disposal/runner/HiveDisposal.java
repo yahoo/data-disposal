@@ -159,12 +159,15 @@ public class HiveDisposal extends Disposal<HiveConfigList, HiveConfigEntry> {
         String database = config.getDatabase(),
                table = config.getTable(),
                datePartitionKey = config.getPartitionFilterKey();
+
         List<HCatFieldSchema> partitionColumns;
 
-        try {
-            partitionColumns = client.getTable(database, table).getPartCols();
-        } catch (HCatException hce) {
-            throw new IllegalStateException("Error occurred getting list of partition columns: ", hce);
+        synchronized (client) {
+            try {
+                partitionColumns = client.getTable(database, table).getPartCols();
+            } catch (HCatException hce) {
+                   throw new IllegalStateException("Error occurred getting list of partition columns: ", hce);
+            }
         }
 
         return partitionColumns.parallelStream().filter(
@@ -176,10 +179,11 @@ public class HiveDisposal extends Disposal<HiveConfigList, HiveConfigEntry> {
      * Helper method invoked by both constructors to validate the configuration of the new HiveDisposal object.
      * Mainly exists to avoid code duplication.
      */
+
     protected void validateConfig() {
         this.config.getEntries().parallelStream().forEach(hiveConfigEntry -> {
             HiveConfigEntry entry = (HiveConfigEntry) hiveConfigEntry;
-            if (!verifyDatePartitionExists(hcatClient, entry)) {
+            if (entry.isValidationEnabled() && !verifyDatePartitionExists(hcatClient, entry)) {
                 throw new IllegalStateException(
                         "Failed to detect date partition column " + entry.getPartitionFilterKey() + " in " +
                         entry.getDatabase() + "." + entry.getTable() + ". Please review the table's schema " +
