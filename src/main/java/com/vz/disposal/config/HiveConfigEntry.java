@@ -27,6 +27,10 @@ public class HiveConfigEntry extends ConfigEntry {
     @Getter
     @Setter
     private Boolean enableHivePartitionFilter;
+    
+    @Getter
+    @Setter
+    private boolean validationEnabled = true;
 
     @Override
     public void setDateFormat(String dateFormat) {
