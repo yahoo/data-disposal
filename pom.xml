@@ -17,7 +17,7 @@
     <properties>
         <hiveVersion>3.1.2</hiveVersion>
         <hadoopVersion>3.2.1</hadoopVersion>
-        <jacksonVersion>2.3.0</jacksonVersion>
+        <jacksonVersion>2.12.1</jacksonVersion>
         <javadoc_jdk_version>1.8</javadoc_jdk_version>
     </properties>
 
