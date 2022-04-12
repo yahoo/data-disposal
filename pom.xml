@@ -16,7 +16,7 @@
     </scm>
     <properties>
         <hiveVersion>3.1.2</hiveVersion>
-        <hadoopVersion>3.2.1</hadoopVersion>
+        <hadoopVersion>3.2.3</hadoopVersion>
         <jacksonVersion>2.3.0</jacksonVersion>
         <javadoc_jdk_version>1.8</javadoc_jdk_version>
     </properties>
